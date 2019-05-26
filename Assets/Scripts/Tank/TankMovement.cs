@@ -15,7 +15,9 @@ public class TankMovement : MonoBehaviour
     private Rigidbody m_Rigidbody;         
     private float m_MovementInputValue;    
     private float m_TurnInputValue;        
-    private float m_OriginalPitch;         
+    private float m_OriginalPitch;   
+
+    public Transform fireTransform;     
 
 
     private void Awake()
@@ -103,5 +105,7 @@ public class TankMovement : MonoBehaviour
         Quaternion turnRotation = Quaternion.Euler(0f, turn, 0f);
 
         m_Rigidbody.MoveRotation(m_Rigidbody.rotation * turnRotation);
+
+        fireTransform.RotateAround(new Vector3(transform.position.x, fireTransform.position.y, transform.position.z), -1 * transform.up, turn);
     }
 }
