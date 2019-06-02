@@ -17,7 +17,9 @@ public class TankShooting : MonoBehaviour
     private string m_FireButton;         
     private float m_CurrentLaunchForce;  
     private float m_ChargeSpeed;         
-    private bool m_Fired;                
+    private bool m_Fired;    
+
+    private float m_AimSliderDirection;
 
 
     private void OnEnable()
@@ -40,27 +42,35 @@ public class TankShooting : MonoBehaviour
 
         m_AimSlider.value = m_MinLaunchForce;
 
-        if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired){
+        // if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired){
             
-            m_CurrentLaunchForce = m_MaxLaunchForce;
-            Fire();
+        //     m_CurrentLaunchForce = m_MaxLaunchForce;
+        //     Fire();
 
-        }else if(Input.GetButtonDown(m_FireButton)){
+        // }else
+        if(Input.GetButtonDown(m_FireButton)){
             
             m_Fired = false;
+            m_AimSliderDirection = 1f;
             m_CurrentLaunchForce = m_MinLaunchForce;
 
             m_ShootingAudio.clip = m_ChargingClip;
             m_ShootingAudio.Play();
 
         }else if(Input.GetButton(m_FireButton) && !m_Fired){
+
+            // 反復フラグきりかえ
+            if(m_AimSliderDirection > 0 && m_CurrentLaunchForce >= m_MaxLaunchForce){
+                m_AimSliderDirection = -1f;
+            }else if(m_AimSliderDirection < 0 && m_CurrentLaunchForce <= m_MinLaunchForce){
+                m_AimSliderDirection = 1f;
+            }
             
-            m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
+            m_CurrentLaunchForce += m_AimSliderDirection * m_ChargeSpeed * Time.deltaTime;
 
             m_AimSlider.value = m_CurrentLaunchForce;
 
-        }else if(Input.GetButtonUp(m_FireButton) && !m_Fired){
-
+        }else if(!Input.GetButtonUp(m_FireButton) && !m_Fired){
             Fire();
 
         }
@@ -71,6 +81,7 @@ public class TankShooting : MonoBehaviour
     {
         // Instantiate and launch the shell.
         m_Fired = true;
+        m_AimSliderDirection = 1f;
 
         Rigidbody shellInstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
 
